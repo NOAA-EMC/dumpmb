@@ -1,0 +1,28 @@
+Resetting modules to system default. Reseting $MODULEPATH back to system default. All extra directories will be removed from $MODULEPATH.
+
+Currently Loaded Modules:
+  1) craype-x86-rome     (H)   4) envvar/1.0           7) craype/2.7.8  10) bufr/11.6.0
+  2) libfabric/1.11.0.0. (H)   5) PrgEnv-intel/8.1.0   8) w3emc/2.9.1
+  3) craype-network-ofi  (H)   6) intel/19.1.3.304     9) w3nco/2.4.1
+
+  Where:
+   H:  Hidden Module
+
+ 
+
+
+make-ing bufr_argodump
+
+ftn -O2 -g -traceback  -free  -c -o bufr_argodump.o bufr_argodump.f
+ftn -O2 -g -traceback  -free  -o bufr_argodump bufr_argodump.f   /apps/ops/prod/libs/intel/19.1.3.304/w3nco/2.4.1/lib/libw3nco_4.a /apps/ops/prod/libs/intel/19.1.3.304/w3emc/2.9.1/lib64/libw3emc_4.a /apps/ops/prod/libs/intel/19.1.3.304/bufr/11.6.0/lib64/libbufr_4.a
+
+make-ing bufr_prepmods
+
+ftn -O2 -g -traceback   -c -o bufr_prepmods.o bufr_prepmods.f
+ftn -O2 -g -traceback   -c -o clonlat.o clonlat.f
+ftn -O2 -g -traceback   -c -o mnemonics.o mnemonics.f
+ftn -O2 -g -traceback   -c -o obname.o obname.f
+ftn -O2 -g -traceback   -c -o raddate.o raddate.f
+ftn -O2 -g -traceback   -c -o ssmipn.o ssmipn.f
+ftn -O2 -g -traceback   -c -o tideg.o tideg.f
+ftn -O2 -g -traceback   -o bufr_prepmods bufr_prepmods.o clonlat.o mnemonics.o obname.o raddate.o ssmipn.o tideg.o  /apps/ops/prod/libs/intel/19.1.3.304/w3nco/2.4.1/lib/libw3nco_4.a /apps/ops/prod/libs/intel/19.1.3.304/w3emc/2.9.1/lib64/libw3emc_4.a /apps/ops/prod/libs/intel/19.1.3.304/bufr/11.6.0/lib64/libbufr_4.a

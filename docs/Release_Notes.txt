@@ -1,0 +1,50 @@
+bufr-dump v1.?.?        RELEASED        ??? ??,2025
+          v1.?.?        IMPLEMENTED     ??? ??,2025
+
+PRELUDE
+ This update brings in / supports / improves ... i.e. summarize the update impact. 
+
+FILE CHANGES
+ M docs/Release_Notes.txt
+ M versions/VERSION  
+(M-modified; A-added; D-deleted)
+
+DOCS CHANGES
+ docs/Release_Notes.txt
+ Updated for this release.
+
+SOURCE CHANGES
+ list if any; example:
+ sorc/build.sh
+ Changed...something, something
+
+VERSIONS CHANGES
+ version/VERSION
+ Reflects this release's version
+
+CHANGES TO OUTPUT AND FILE SIZES
+ describe if any, example:
+ Process addition data and generate new dumps:
+ *some_name*, etc.
+
+PRE-IMPLEMENTATION TESTING REQUIREMENTS
+ dumpmb needs modules bufr-dump and .....what else.... in order to run.
+ See docs/README.md for build instructions
+ See versions/*.ver for required libaries
+
+DISSEMINATION INFORMATION
+ No changes to dissemination on WCOSS2
+
+SPECIAL INSTRUCTIONS
+ 1.example:Implement release/dumpmb.v1.1.0 at the same time as .... 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+dumpmb  v1.0.0	RELEASED	??? ?? 2022
+        v1.0.0	IMPLEMENTED	MAY 11 2022
+
+Transition from WCOSS Cray and Phase3 to WCOSS2
+======================================
+
+Dodcumentation on the first dumpmb installation on WCOSS2 is missing.
+
+END
