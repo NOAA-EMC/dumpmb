@@ -93,6 +93,7 @@ C-----------------------------------------------------------------------
       print *
 
       bmiss=10e10; call setbmiss(bmiss)
+
       iret=isetprm('MAXSS',200000)
 
 
@@ -113,9 +114,13 @@ C  -------------------------------------
       NRPT_MOD = 0
  
 1     DO WHILE(IREADMG(LUBFR,NCOSET,IDATE).EQ.0)
-      read(ncoset(3:5),'(i3)') mtp
-      read(ncoset(6:8),'(i3)') mst
-      subset = obname(mtp,mst)
+      if(ncoset=='MBUOYB') then
+         subset='DBUOY'
+      else
+         read(ncoset(3:5),'(i3)') mtp
+         read(ncoset(6:8),'(i3)') mst
+         subset = obname(mtp,mst)
+      endif
 
       if(subset.eq.'        ') then
          print*,ncoset,' >>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<'
@@ -184,12 +189,14 @@ c  -------------------------------------------------------
 
       DBNEM='DBSS STMP SALN DROC SPOC'
 
-      if(subset=='DBUOY'.and.ncoset=='NC001002') then
+      if(subset=='DBUOY'.and.ncoset=='NC001002')
+     .then
          CALL UFBINT(LUBFR,ARR,MAX1,MAX2,LEV2,DBNEM)
          IF(LEV2>0) CALL UFBINT(LUBFO,ARR,MAX1,LEV2,IRET,DBNEM)
       endif
 
-      if(subset=='DBUOY'.and.ncoset=='NC001103') then
+      if(subset=='DBUOY'.and.(ncoset=='NC001103'.or.ncoset=='MBUOYB'))
+     .then
          call ufbseq(lubfr,stsl,3,max2,lev0,'BBYSTSL')
          call ufbseq(lubfr,curr,3,max2,lev1,'BBYCURR')
          lev2=lev0+lev1

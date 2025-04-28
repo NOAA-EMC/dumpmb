@@ -13,5 +13,8 @@ module list
 
 mkdir -p ../exec
 
-(cd bufr_argodump.fd; ./makefile.sh)
-(cd bufr_prepmods.fd; ./makefile.sh)
+(cd bufr_argodump.fd;  ./makefile.sh)
+(cd bufr_prepmods.fd;  ./makefile.sh)
+(cd bufr_buoydump.fd;  ./makefile.sh)
+(cd bufr_bathydump.fd; ./makefile.sh)
+

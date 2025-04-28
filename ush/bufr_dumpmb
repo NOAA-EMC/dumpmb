@@ -63,7 +63,7 @@ vertxt=' '
 # Environment variables ( [ default value] ):
 #  DATA - directory path for MODS output      [ pwd ]
 #  TANK - directory path to online data       [ /dcom/us007003 ]    
-#  MODX - path to bufr_prepmods exec          [ $HOMEcfs/exec/bufr_prepmods ]
+#  MODX - path to bufr_buoydump exec          [ $HOMEcfs/exec/bufr_buoydump ]
 #  DUMP - path to general dump script         [ $HOMEdump/ush/dumpjb ]
 #  LIST - path to dumplist file               [ $HOMEdump/fix/bufr_dumplist ]
 #  BTAB - path to MODS bufrtable              [ $HOMEdump/fix/bufrtab.mods ]
@@ -87,7 +87,7 @@ vertxt=' '
 # Modules and files referenced:
 #  user scripts: dumpjb
 #  fixed fields: bufr_dumplist  bufrtab.mods
-#  executables : bufr_prepmods  $NDATE 
+#  executables : bufr_buoydump  $NDATE 
 #
 #
 # Issues/caveats:
@@ -159,7 +159,7 @@ if [ $RC_ARG -eq 0 ] ; then
 # Parse args for valid data types
 # -------------------------------
   t000=' metar '
-  t001=' ships  dbuoy  mbuoy  lcman  tideg  slpbg  cstgd  shipsu'
+  t001=' ships  dbuoy  mbuoy  lcman  tideg  slpbg  cstgd  shipsu mbuoyb'
   t012='        sstns  sstnvh ssmipn '  # ersal
   t031=' bathy  tesac  trkob  nersal ngfoal ntpxal njsnal envsal'
 
@@ -250,7 +250,7 @@ if [ $RC_ARG -eq 0 ] ; then
   DATA=${DATA:-"`pwd`"}
 
   #DUMP=${DUMP:-"$HOMEcfs/ush/bufr_dumparte"}
-  #MODX=${MODX:-"$HOMEcfs/exec/bufr_prepmods"}
+  #MODX=${MODX:-"$HOMEcfs/exec/bufr_buoydump"}
   #BTAB=${BTAB:-"$HOMEdump/fix/bufrtab.mods"}
   #LIST=${LIST:-"$BUFR_DUMPLIST"}
 
@@ -382,10 +382,15 @@ while [ $cymd -le $cymd2 ] ; do
 
 #--Build MODS file spec
     
+    set -x
+    echo $MODSROOT
     export MODSROOT=${MODSROOT:-$(compath.py obsproc/${obsproc_ver})/mods}
     YYYY=`echo $cymd | cut -c1-4`
       MM=`echo $cymd | cut -c5-6`
     mspec=$MODSROOT.$YYYY/$MM/$DTYP/$mfile
+    [[ $DTYP = dbuoy ]] && { nspec=$(echo $mspec|sed -e"s/dbuoy/mbuoyb/g"); mspec=$nspec; }       
+    echo "dumpmb: mspec=$mspec"
+    set +x
 
 
 #--Check if dcom file exists
@@ -405,7 +410,7 @@ while [ $cymd -le $cymd2 ] ; do
 
 #  ----save value of DATA then set to blank; this allows dumpjb 
 #       to use the current, MODS tmp working dir (pwd) so that the 
-#       following bufr_prepmods step will be able to find the dump 
+#       following bufr_buoydump step will be able to find the dump 
 #       files as input.
 
       userDATA=$DATA
@@ -420,7 +425,7 @@ while [ $cymd -le $cymd2 ] ; do
       [ -f $DTYP.ibm ] && /bin/rm $DTYP.ibm > /dev/null 2>&1
       echo "dumpmb: $DUMP ${cymd}$TIME_CENTER $TIME_RADIUS $DTYP"
       $DUMP ${cymd}$TIME_CENTER $TIME_RADIUS $DTYP  > dumpjbout 2>&1
-      rc_dump=$?; [[ $DTYP = tesac ]] && cat dumpjbout
+      rc_dump=$?; [[ $DTYP = tesac || $DTYP = bathy ]] && cat dumpjbout
       DATA=$userDATA
 
       echo "dumpmb: DUMPJB finished  $DTYP $cymd - RC=$rc_dump"
@@ -454,7 +459,7 @@ while [ $cymd -le $cymd2 ] ; do
         echo $msg
 
 
-#  --Run converter program (bufr_prepmods)
+#  --Run converter program (bufr_buoydump)
         echo
         echo "dumpmb: Running $pgm program to create MODS file $mfile"
         if [ -s $mfile ] ; then 
@@ -474,7 +479,7 @@ while [ $cymd -le $cymd2 ] ; do
 
           if [ ! -s $DTYP.ibm -o ! -s $BTAB ] ; then 
             echo 
-            echo "dumpmb: ERROR: - bufr_prepmods input ($DTYP.ibm) missing"
+            echo "dumpmb: ERROR: - bufr_buoydump input ($DTYP.ibm) missing"
             echo "dumpmb: Skipping creation of MODS file $mfile"
             rc_modx=55
           else 
@@ -551,12 +556,16 @@ while [ $cymd -le $cymd2 ] ; do
       if [ -s $mspec ] ; then 
         echo "dumpmb: ! Found MODS file ($mfile) in online archive"
         echo "dumpmb: ...copying this archive file to user dir"
-        if [ -s $DATA/`basename $mspec` ] ; then 
-          echo "dumpmb: ...overwriting local file ($DATA/`basename $mspec`)"
-        fi # local basename mfile exists
-        echo "  cp -p $mspec $DATA/"
-        cp -p $mspec $DATA/
-        #chmod 644 $DATA/$mfile
+        # for dbuoy/mbuoyb run $MODX on modsbufr file #
+        if [[ $mfile = dbuoy.$cymd ]]; then
+           ln -sf $mspec       fort.20 
+           ln -sf $BTAB        fort.21 
+           ln -sf $mfile       fort.50
+           $MODX | grep reports
+           cp $mfile $DATA
+        else
+           cp -p $mspec $DATA/$mfile
+        fi
         RC_MAX=0
       else # MODS file not exist
         echo "dumpmb: ! MODS file ($mfile) not found in $mspec archive"

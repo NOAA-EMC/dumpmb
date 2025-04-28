@@ -1,7 +1,27 @@
 #!/usr/bin/env bash
 set -uxa
 
-if [[ $3 = tesac && $# -eq 3 && ${GODAS:-YES} = YES ]]; then
+if [[ $3 = bathy && $# -eq 3 ]]; then # make new bathy dump look like old bathy dump and cat with really old bathys
+
+  rm -f bathy.ibm 031.ibm newbathy
+ 
+  TANK=$DCOMROOT
+  $DUMPJB $1 $2 bathy   >/dev/null 2>&1     # old bathy
+  $DUMPJB $1 $2 031 006 >/dev/null 2>&1     # new bathy
+  unset FORT20 FORT21 FORT50; rm -rf fort.*
+  ln -sf 031.ibm   fort.20
+  ln -sf newbathy  fort.50
+  $BATYDUMP >/dev/null 2>&1
+
+  cat newbathy >> bathy.ibm
+
+  echo
+  ls -l 031.ibm
+  ls -l newbathy 
+  ls -l bathy.ibm
+  echo
+
+elif [[ $3 = tesac && $# -eq 3 && ${GODAS:-YES} = YES ]]; then # combine argo floats with tesac data
 
   export DUPC=OFF
 
@@ -30,11 +50,8 @@ if [[ $3 = tesac && $# -eq 3 && ${GODAS:-YES} = YES ]]; then
 elif [[ $3 = dbuoy && $# -eq 3  && ${GODAS:-YES} = YES ]]; then
 
   # dump marine subtypes 002 and 103 into dbuoy collective    
-  if [ $NET = godas ]; then
-    $DUMPJB $1 $2 001 002 103 >/dev/null 2>&1  
-  else
-    $DUMPJB $1 $2 001 103 >/dev/null 2>&1  
-  fi
+
+  $DUMPJB $1 $2 001 103 >/dev/null 2>&1  
 
   mv 001.ibm dbuoy.ibm            
 
