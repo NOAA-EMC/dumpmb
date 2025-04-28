@@ -8,4 +8,4 @@ clone https://github.com/NOAA-EMC/dumpmb.git
 cd dumpmb && cd sorc
 ./build.sh
 ```
-Code manager: Jack Woolen
+Code manager: Jack Woollen
